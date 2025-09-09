@@ -291,7 +291,7 @@ class VOCDetection(CacheDataset):
         print("Eval IoU : {:.2f}".format(iou))
         if output_dir is not None and not os.path.isdir(output_dir):
             os.mkdir(output_dir)
-        for i, cls in enumerate(VOC_CLASSES):
+        for i, cls in enumerate(self._classes):
 
             if cls == "__background__":
                 continue
