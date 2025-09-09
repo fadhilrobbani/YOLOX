@@ -16,6 +16,10 @@ Training deep learning models like YOLOX on a CPU is extremely slow and not reco
 Once you have selected the GPU runtime, execute the following commands in a code cell:
 
 ```bash
+# Mount Google Drive
+from google.colab import drive
+drive.mount('/content/drive')
+
 # Clone your forked YOLOX repository
 !git clone https://github.com/fadhilrobbani/YOLOX.git
 %cd YOLOX
@@ -112,7 +116,7 @@ After the training is complete, you can export the trained model to ONNX format.
 
 ```bash
 # Export to ONNX
-!python3 tools/export_onnx.py --output-name cup_yolox.onnx -f exps/example/custom_voc/yolox_voc_m.py -c YOLOX_outputs/yolox_voc_m/best_ckpt.pth
+!python3 tools/export_onnx.py --output-name cup_yolox.onnx -f exps/example/custom_voc/yolox_voc_m.py -c "/content/drive/MyDrive/Colab Notebooks/trained_models/cup-detection-yolox/yolox_voc_m/best_ckpt.pth"
 ```
 
 This will create a `cup_yolox.onnx` file in your `YOLOX` directory, which you can then download and use for inference.
