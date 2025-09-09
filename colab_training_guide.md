@@ -38,11 +38,6 @@ First, upload your zipped dataset (e.g., `your_dataset.zip`) to your Colab sessi
 ```bash
 # Example: if your zip file is named 'my_dataset.zip'
 !unzip /content/my_dataset.zip -d /content/datasets
-
-# VERIFY: Check the unzipped dataset structure. This should show 'train', 'test', 'valid' folders.
-!echo "Verifying unzipped dataset structure in /content/datasets:"
-!ls -lR /content/datasets | head -n 10 # Show first 10 entries recursively
-!echo "If the above output does not show 'train', 'test', 'valid' folders directly under /content/datasets, you may need to adjust the 'find' paths in Step 2.3 accordingly."
 ```
 
 ### Step 2.2: Create the YOLOX-Expected VOC Structure
@@ -58,42 +53,20 @@ Now, create the necessary PASCAL VOC directory structure *within your cloned YOL
 
 ### Step 2.3: Move Your Dataset Files into the YOLOX Structure
 
-Now, move your actual image (`.jpg`) and annotation (`.xml`) files from where you unzipped them (e.g., `/content/datasets/train`, `/content/datasets/test`, `content/datasets/valid`) into the newly created `JPEGImages` and `Annotations` folders.
+Now, move your actual image (`.jpg`) and annotation (`.xml`) files from where you unzipped them (`/content/datasets/train`, `/content/datasets/test`, `content/datasets/valid`) into the newly created `JPEGImages` and `Annotations` folders.
 
 ```bash
-# VERIFY: Check source files before moving
-!echo "Checking source JPG files in /content/datasets (first 5 found):"
-!find /content/datasets -type f -name "*.jpg" | head -n 5
-!echo "Checking source XML files in /content/datasets (first 5 found):"
-!find /content/datasets -type f -name "*.xml" | head -n 5
-
-# VERIFY: Check if target directories exist and are empty before moving
-!echo "Checking target JPEGImages directory before move:"
-!ls -l ./datasets/VOCdevkit/VOC2007/JPEGImages/
-!echo "Checking target Annotations directory before move:"
-!ls -l ./datasets/VOCdevkit/VOC2007/Annotations/
-
 # Move all .jpg files from your uploaded 'train', 'test', 'valid' folders
 # into the YOLOX-expected JPEGImages directory.
-# The `find` command moves files, preserving their original filenames.
-!find /content/datasets -type f -name "*.jpg" -exec mv {} ./datasets/VOCdevkit/VOC2007/JPEGImages/ \;
-
-# VERIFY: Check if JPGs are moved to the target directory after move
-!echo "Checking JPEGImages content after move (first 5 entries):"
-!ls -l ./datasets/VOCdevkit/VOC2007/JPEGImages/ | head -n 5
-!echo "Total JPGs moved:"
-!find ./datasets/VOCdevkit/VOC2007/JPEGImages -type f -name "*.jpg" | wc -l
+!mv /content/datasets/train/*.jpg ./datasets/VOCdevkit/VOC2007/JPEGImages/
+!mv /content/datasets/test/*.jpg ./datasets/VOCdevkit/VOC2007/JPEGImages/
+!mv /content/datasets/valid/*.jpg ./datasets/VOCdevkit/VOC2007/JPEGImages/
 
 # Move all .xml files from your uploaded 'train', 'test', 'valid' folders
 # into the YOLOX-expected Annotations directory.
-# The `find` command moves files, preserving their original filenames.
-!find /content/datasets -type f -name "*.xml" -exec mv {} ./datasets/VOCdevkit/VOC2007/Annotations/ \;
-
-# VERIFY: Check if XMLs are moved to the target directory after move
-!echo "Checking Annotations content after move (first 5 entries):"
-!ls -l ./datasets/VOCdevkit/VOC2007/Annotations/ | head -n 5
-!echo "Total XMLs moved:"
-!find ./datasets/VOCdevkit/VOC2007/Annotations -type f -name "*.xml" | wc -l
+!mv /content/datasets/train/*.xml ./datasets/VOCdevkit/VOC2007/Annotations/
+!mv /content/datasets/test/*.xml ./datasets/VOCdevkit/VOC2007/Annotations/
+!mv /content/datasets/valid/*.xml ./datasets/VOCdevkit/VOC2007/Annotations/
 ```
 
 ### Step 2.4: Generate ImageSet Files

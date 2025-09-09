@@ -66,7 +66,7 @@ class Exp(MyExp):
     def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False):
         from yolox.evaluators import VOCEvaluator
 
-        return VOCevaluator(
+        return VOCEvaluator(
             dataloader=self.get_eval_loader(batch_size, is_distributed,
                                             testdev=testdev, legacy=legacy),
             img_size=self.test_size,
