@@ -251,7 +251,7 @@ class VOCDetection(CacheDataset):
         return path
 
     def _write_voc_results_file(self, all_boxes):
-        for cls_ind, cls in enumerate(VOC_CLASSES):
+        for cls_ind, cls in enumerate(self._classes):
             cls_ind = cls_ind
             if cls == "__background__":
                 continue
