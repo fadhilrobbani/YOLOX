@@ -4,7 +4,16 @@ This guide provides a step-by-step walkthrough for training your custom YOLOX mo
 
 ## 1. Setting up the Colab Environment
 
-First, open a new Colab notebook and set the runtime to use a GPU (Runtime -> Change runtime type -> GPU). Then, execute the following commands in a code cell:
+**IMPORTANT: Before proceeding, ensure your Google Colab runtime is set to GPU.**
+To do this:
+1.  Go to `Runtime` in the top menu.
+2.  Select `Change runtime type`.
+3.  Under `Hardware accelerator`, choose `GPU`.
+4.  Click `Save`.
+
+Training deep learning models like YOLOX on a CPU is extremely slow and not recommended. The code is optimized for NVIDIA GPUs.
+
+Once you have selected the GPU runtime, execute the following commands in a code cell:
 
 ```bash
 # Clone your forked YOLOX repository
@@ -12,30 +21,112 @@ First, open a new Colab notebook and set the runtime to use a GPU (Runtime -> Ch
 %cd YOLOX
 
 # Install dependencies
+!pip install onnx onnxsim
 !pip install -r requirements.txt
 !pip install -e .
 !pip install cython; pip install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
-!pip install onnx onnxsim
 ```
 
-## 2. Uploading Your Dataset
+## 2. Preparing Your Dataset
 
-You will need to upload your PASCAL VOC formatted dataset to your Colab environment. You can do this by:
+The YOLOX `VOCDetection` class expects a specific folder structure for PASCAL VOC datasets. Since your Roboflow dataset is organized with `train`, `test`, and `valid` subfolders containing images and annotations, we need to move these files into the expected YOLOX structure.
 
-*   **Uploading from your local machine**: Use the file browser in the left-hand sidebar to upload your dataset.
-*   **Mounting Google Drive**: Mount your Google Drive and place your dataset there.
+### Step 2.1: Upload and Unzip Your Dataset
 
-Once uploaded, create a symbolic link to the dataset directory:
+First, upload your zipped dataset (e.g., `your_dataset.zip`) to your Colab session storage (usually `/content/`). Then, unzip it. **Ensure that after unzipping, your `train`, `test`, and `valid` folders are directly under `/content/datasets/`**.
 
 ```bash
-# Create a symbolic link to your dataset
-# Make sure to replace /path/to/your/VOCdevkit with the actual path
-!ln -s /path/to/your/VOCdevkit ./datasets/VOCdevkit
+# Example: if your zip file is named 'my_dataset.zip'
+!unzip /content/my_dataset.zip -d /content/datasets
+
+# VERIFY: Check the unzipped dataset structure. This should show 'train', 'test', 'valid' folders.
+!echo "Verifying unzipped dataset structure in /content/datasets:"
+!ls -lR /content/datasets | head -n 10 # Show first 10 entries recursively
+!echo "If the above output does not show 'train', 'test', 'valid' folders directly under /content/datasets, you may need to adjust the 'find' paths in Step 2.3 accordingly."
 ```
+
+### Step 2.2: Create the YOLOX-Expected VOC Structure
+
+Now, create the necessary PASCAL VOC directory structure *within your cloned YOLOX project*. This is where YOLOX will look for your data.
+
+```bash
+# Create the main VOCdevkit and VOC2007 folders within the YOLOX project
+!mkdir -p ./datasets/VOCdevkit/VOC2007/ImageSets/Main
+!mkdir -p ./datasets/VOCdevkit/VOC2007/Annotations
+!mkdir -p ./datasets/VOCdevkit/VOC2007/JPEGImages
+```
+
+### Step 2.3: Move Your Dataset Files into the YOLOX Structure
+
+Now, move your actual image (`.jpg`) and annotation (`.xml`) files from where you unzipped them (e.g., `/content/datasets/train`, `/content/datasets/test`, `content/datasets/valid`) into the newly created `JPEGImages` and `Annotations` folders.
+
+```bash
+# VERIFY: Check source files before moving
+!echo "Checking source JPG files in /content/datasets (first 5 found):"
+!find /content/datasets -type f -name "*.jpg" | head -n 5
+!echo "Checking source XML files in /content/datasets (first 5 found):"
+!find /content/datasets -type f -name "*.xml" | head -n 5
+
+# VERIFY: Check if target directories exist and are empty before moving
+!echo "Checking target JPEGImages directory before move:"
+!ls -l ./datasets/VOCdevkit/VOC2007/JPEGImages/
+!echo "Checking target Annotations directory before move:"
+!ls -l ./datasets/VOCdevkit/VOC2007/Annotations/
+
+# Move all .jpg files from your uploaded 'train', 'test', 'valid' folders
+# into the YOLOX-expected JPEGImages directory.
+# The `find` command moves files, preserving their original filenames.
+!find /content/datasets -type f -name "*.jpg" -exec mv {} ./datasets/VOCdevkit/VOC2007/JPEGImages/ \;
+
+# VERIFY: Check if JPGs are moved to the target directory after move
+!echo "Checking JPEGImages content after move (first 5 entries):"
+!ls -l ./datasets/VOCdevkit/VOC2007/JPEGImages/ | head -n 5
+!echo "Total JPGs moved:"
+!find ./datasets/VOCdevkit/VOC2007/JPEGImages -type f -name "*.jpg" | wc -l
+
+# Move all .xml files from your uploaded 'train', 'test', 'valid' folders
+# into the YOLOX-expected Annotations directory.
+# The `find` command moves files, preserving their original filenames.
+!find /content/datasets -type f -name "*.xml" -exec mv {} ./datasets/VOCdevkit/VOC2007/Annotations/ \;
+
+# VERIFY: Check if XMLs are moved to the target directory after move
+!echo "Checking Annotations content after move (first 5 entries):"
+!ls -l ./datasets/VOCdevkit/VOC2007/Annotations/ | head -n 5
+!echo "Total XMLs moved:"
+!find ./datasets/VOCdevkit/VOC2007/Annotations -type f -name "*.xml" | wc -l
+```
+
+### Step 2.4: Generate ImageSet Files
+
+Finally, create the `trainval.txt` and `test.txt` files that list the image IDs. These files are crucial for YOLOX to identify which images belong to which dataset split.
+
+**IMPORTANT:** The commands below use a robust `for` loop with `basename -s .jpg` to ensure that only the correct filename (without the `.jpg` extension) is written to the text files, even if the filenames contain multiple dots. Each line is prefixed with `!` for execution in Colab.
+
+```bash
+# Generate trainval.txt (list of all image filenames without extension)
+# This iterates through all JPG files, extracts their base filename without the .jpg extension, and writes to trainval.txt.
+! ( \
+for img_path in ./datasets/VOCdevkit/VOC2007/JPEGImages/*.jpg; do \
+  filename=$(basename "$img_path" .jpg); \
+  echo "$filename"; \
+done \
+) > ./datasets/VOCdevkit/VOC2007/ImageSets/Main/trainval.txt
+
+# Generate test.txt (can be the same as trainval.txt if you're not using a separate test set)
+# This iterates through all JPG files, extracts their base filename without the .jpg extension, and writes to test.txt.
+! ( \
+for img_path in ./datasets/VOCdevkit/VOC2007/JPEGImages/*.jpg; do \
+  filename=$(basename "$img_path" .jpg); \
+  echo "$filename"; \
+done \
+) > ./datasets/VOCdevkit/VOC2007/ImageSets/Main/test.txt
+```
+
+Your dataset is now correctly structured for YOLOX.
 
 ## 3. Running the Training
 
-Now you are ready to start the training process. Execute the following command in a code cell. This command uses the custom experiment file we created.
+Now you are ready to start the training process. Execute the following command in a code cell.
 
 ```bash
 # Start training

@@ -45,7 +45,7 @@ class Exp(MyExp):
             cache_type=cache_type,
         )
 
-    def get_eval_dataset(self, **kwargs):
+    def get_eval_dataset(self, cache: bool = False, cache_type: str = "ram", **kwargs):
         from yolox.data import VOCDetection, ValTransform
         from yolox.data.datasets.custom_voc_classes import CUSTOM_VOC_CLASSES
         from yolox.data.datasets.voc import AnnotationTransform
@@ -59,10 +59,12 @@ class Exp(MyExp):
             target_transform=AnnotationTransform(
                 class_to_ind=dict(zip(CUSTOM_VOC_CLASSES, range(self.num_classes)))
             ),
+            cache=cache, # Add cache argument
+            cache_type=cache_type, # Add cache_type argument
         )
 
     def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False):
-        from yolox.evaluators import VOCevaluator
+        from yolox.evaluators import VOCEvaluator
 
         return VOCevaluator(
             dataloader=self.get_eval_loader(batch_size, is_distributed,
