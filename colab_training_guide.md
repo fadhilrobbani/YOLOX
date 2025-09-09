@@ -11,7 +11,7 @@ First, open a new Colab notebook and set the runtime to use a GPU (Runtime -> Ch
 !git clone https://github.com/fadhilrobbani/YOLOX.git
 %cd YOLOX
 
-# Install dependencies
+# Install dependencies (with updated requirements)
 !pip install -r requirements.txt
 !pip install -e .
 !pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
