@@ -16,10 +16,6 @@ Training deep learning models like YOLOX on a CPU is extremely slow and not reco
 Once you have selected the GPU runtime, execute the following commands in a code cell:
 
 ```bash
-# Mount Google Drive
-from google.colab import drive
-drive.mount('/content/drive')
-
 # Clone your forked YOLOX repository
 !git clone https://github.com/fadhilrobbani/YOLOX.git
 %cd YOLOX

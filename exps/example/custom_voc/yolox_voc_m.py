@@ -44,6 +44,7 @@ class Exp(MyExp):
             ),
             cache=cache,
             cache_type=cache_type,
+            class_names=CUSTOM_VOC_CLASSES,
         )
 
     def get_eval_dataset(self, cache: bool = False, cache_type: str = "ram", **kwargs):
@@ -62,6 +63,7 @@ class Exp(MyExp):
             ),
             cache=cache, # Add cache argument
             cache_type=cache_type, # Add cache_type argument
+            class_names=CUSTOM_VOC_CLASSES,
         )
 
     def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False):

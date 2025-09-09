@@ -108,6 +108,7 @@ class VOCDetection(CacheDataset):
         dataset_name="VOC0712",
         cache=False,
         cache_type="ram",
+        class_names=None,
     ):
         self.root = data_dir
         self.image_set = image_sets
@@ -117,11 +118,11 @@ class VOCDetection(CacheDataset):
         self.name = dataset_name
         self._annopath = os.path.join("%s", "Annotations", "%s.xml")
         self._imgpath = os.path.join("%s", "JPEGImages", "%s.jpg")
-        self._classes = VOC_CLASSES
+        self._classes = VOC_CLASSES if class_names is None else class_names
         self.cats = [
-            {"id": idx, "name": val} for idx, val in enumerate(VOC_CLASSES)
+            {"id": idx, "name": val} for idx, val in enumerate(self._classes)
         ]
-        self.class_ids = list(range(len(VOC_CLASSES)))
+        self.class_ids = list(range(len(self._classes)))
         self.ids = list()
         for (year, name) in image_sets:
             self._year = year
