@@ -11,10 +11,11 @@ First, open a new Colab notebook and set the runtime to use a GPU (Runtime -> Ch
 !git clone https://github.com/fadhilrobbani/YOLOX.git
 %cd YOLOX
 
-# Install dependencies (with updated requirements)
+# Install dependencies
 !pip install -r requirements.txt
 !pip install -e .
-!pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+!pip install cython; pip install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+!pip install onnx onnxsim
 ```
 
 ## 2. Uploading Your Dataset
