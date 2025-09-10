@@ -19,6 +19,12 @@ class Exp(MyExp):
         self.data_dir = "datasets/VOCdevkit"
         self.train_ann = "train.txt"
         self.val_ann = "val.txt"
+        
+              # ---------- transform config ------------ #
+        self.mosaic_prob = 0.0
+        self.mixup_prob = 0.0
+        self.hsv_prob = 0.0
+        self.flip_prob = 0.0
 
         self.num_classes = 2
 

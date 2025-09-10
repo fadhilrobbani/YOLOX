@@ -116,3 +116,10 @@ After the training is complete, you can export the trained model to ONNX format.
 ```
 
 This will create a `cup_yolox.onnx` file in your `YOLOX` directory, which you can then download and use for inference.
+
+
+## Bonus: Continue the training from last checkpoint:
+
+```bash
+python tools/train.py -f exps/example/custom_voc/yolox_voc_m.py --resume -c /content/drive/MyDrive/Colab\ Notebooks/trained_models/cup-detection-yolox/latest_ckpt.pth
+```

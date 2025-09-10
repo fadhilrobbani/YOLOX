@@ -17,6 +17,12 @@ class Exp(MyExp):
         self.output_dir = "/content/drive/MyDrive/Colab Notebooks/trained_models/cup-detection-yolox"
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
 
+        # ---------- transform config ------------ #
+        self.mosaic_prob = 0.0
+        self.mixup_prob = 0.0
+        self.hsv_prob = 0.0
+        self.flip_prob = 0.0
+
         # Define yourself dataset path
         self.data_dir = "datasets/VOCdevkit"
         self.train_ann = "train.txt"
