@@ -54,3 +54,10 @@ python tools/onnx_webcam_demo.py \
 - If you get "Camera not found" error, try different `--camera_id` values
 - For slow performance, reduce input size (e.g., `--input_shape 416,416`)
 - For better accuracy, adjust `--score_thr` (higher values = fewer detections)
+
+
+Run webcam:
+python tools/onnx_webcam_demo.py -m assets/cup_yolox_s.onnx --classes cup cup_body
+
+Run images:
+python tools/onnx_image_demo.py -m assets/cup_yolox_s.onnx -i assets/cup -o detection_results --classes cup cup_body

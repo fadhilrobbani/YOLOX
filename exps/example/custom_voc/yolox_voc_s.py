@@ -30,9 +30,21 @@ class Exp(MyExp):
 
         self.num_classes = 2
 
-        self.max_epoch = 50
         self.data_num_workers = 4
         self.eval_interval = 1
+        
+        # --------------  training config --------------------- #
+        self.warmup_epochs = 5
+        self.max_epoch = 200
+        self.warmup_lr = 0
+        self.basic_lr_per_img = 0.01 / 64.0
+        self.scheduler = "yoloxwarmcos"
+        self.no_aug_epochs = 15
+        self.min_lr_ratio = 0.05
+        self.ema = True
+
+        self.weight_decay = 5e-4
+        self.momentum = 0.9
 
     def get_dataset(self, cache: bool, cache_type: str = "ram"):
         from yolox.data import VOCDetection, TrainTransform
