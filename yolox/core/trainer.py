@@ -57,6 +57,9 @@ class Trainer:
         self.input_size = exp.input_size
         self.best_ap = 0
 
+        self.best_ap = 0
+        self.patience_counter = 0
+
         # metric record
         self.meter = MeterBuffer(window_size=exp.print_interval)
         self.file_name = os.path.join(exp.output_dir, args.experiment_name)
@@ -86,6 +89,9 @@ class Trainer:
             self.before_epoch()
             self.train_in_iter()
             self.after_epoch()
+            if self.args.early_stop and self.patience_counter >= self.exp.early_stop_patience:
+                logger.info("Early stopping triggered. Validation metric did not improve for {} epochs.".format(self.exp.early_stop_patience))
+                break
 
     def train_in_iter(self):
         for self.iter in range(self.max_iter):
@@ -358,6 +364,10 @@ class Trainer:
 
         update_best_ckpt = ap50_95 > self.best_ap
         self.best_ap = max(self.best_ap, ap50_95)
+        if update_best_ckpt:
+            self.patience_counter = 0
+        else:
+            self.patience_counter += 1
 
         if self.rank == 0:
             if self.args.logger == "tensorboard":

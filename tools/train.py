@@ -89,6 +89,13 @@ def make_parser():
         default="tensorboard"
     )
     parser.add_argument(
+        "--early_stop",
+        dest="early_stop",
+        default=False,
+        action="store_true",
+        help="Stop training when validation metric doesn't improve for a given number of epochs",
+    )
+    parser.add_argument(
         "opts",
         help="Modify config options using the command-line",
         default=None,
